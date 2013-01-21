@@ -34,7 +34,7 @@ TopComment =
       TopComment._hover_intent = setTimeout(function() {
         TopComment.cancelXHR();
 
-        json_url = $(el).attr('href') + '.json';
+        json_url = $(el).attr('href') + '.json?limit=1&depth=1';
         top_comment = false;
 
         TopComment.showCommentLoading(el);

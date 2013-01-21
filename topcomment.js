@@ -3,8 +3,12 @@ var TopComment = TopComment || {};
 TopComment =
 {
   comment_cache : {},
+  hover_delay   : 300,
+
   _xhr :          null,
+  _hover_intent : null,
   _commentDivID : "_tc_comment_div",
+
 
   init : function()
   {
@@ -23,40 +27,46 @@ TopComment =
 
   hookEachComment : function(index, el)
   {
-    $(el).hover(function()
+    if ($(el).text().split(" ").length < 2) {
+      return; // no comments (yeah, it's hackish)
+    }
+    $(el).hover(function() // on hover
     {
-      TopComment.cancelXHR();
+      TopComment._hover_intent = setTimeout(function() {
+        TopComment.cancelXHR();
 
-      json_url = $(this).attr('href') + '.json';
-      console.log("URL: " + json_url);
-      top_comment = false;
+        json_url = $(el).attr('href') + '.json';
+        console.log("URL: " + json_url);
+        top_comment = false;
 
-      TopComment.showCommentLoading(el);
+        TopComment.showCommentLoading(el);
 
-      if (json_url in TopComment.comment_cache)
-      {
-        console.log("Found comment in cache!");
-        top_comment = TopComment.comment_cache[json_url];
-        TopComment.showTopComment(el, top_comment);
-      }
-      else
-      {
-        console.log("Fetching comments from JSON!");
-        _xhr = $.getJSON(json_url, function(data)
+        if (json_url in TopComment.comment_cache)
         {
-          console.log("Got comment data! Extracting top_comment");
-          try {
-            top_comment = data[1]['data']['children'][0]['data'];
-            TopComment.showTopComment(el, top_comment);
-          } catch(error) {
-            console.log("Error extracting comment: " + error.message);
-          }
-          TopComment.comment_cache[json_url] = top_comment;
-        });
-      }
+          console.log("Found comment in cache!");
+          top_comment = TopComment.comment_cache[json_url];
+          TopComment.showTopComment(el, top_comment);
+        }
+        else
+        {
+          console.log("Fetching comments from JSON!");
+          _xhr = $.getJSON(json_url, function(data)
+          {
+            console.log("Got comment data! Extracting top_comment");
+            try {
+              top_comment = data[1]['data']['children'][0]['data'];
+              TopComment.showTopComment(el, top_comment);
+            } catch(error) {
+              console.log("Error extracting comment: " + error.message);
+            }
+            TopComment.comment_cache[json_url] = top_comment;
+          });
+        }
+      }, TopComment.hover_delay);
     },
 
     function () { // on hover out
+      try{clearTimeout(TopComment._hover_intent);} catch(e){};
       TopComment.cancelXHR();
       TopComment.hideTopComment(el);
     });
@@ -75,7 +85,7 @@ TopComment =
         'position' : 'absolute',
         'top' : offset.top + height + "px",
         'left' : offset.left,
-        'width' : '60%',
+        'max-width' : '500px',
         'background' : '#fff',
         'padding' : '10px',
         'border' : '1px solid #777'
@@ -86,7 +96,7 @@ TopComment =
   showCommentLoading : function (el)
   {
     console.log("showCommentLoading");
-    $(TopComment.getMessageDIV(el)).html("Loading comment...");
+    $(TopComment.getMessageDIV(el)).html("<span class='md'>Loading top comment...</span>");
   },
   showTopComment : function (el, top_comment)
   {
@@ -101,7 +111,7 @@ TopComment =
   },
   hideTopComment : function (el, top_comment)
   {
-    $(TopComment.getMessageDIV(el)).remove();
+    $("#" + TopComment._commentDivID).remove();
   }
 }
 

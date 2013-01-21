@@ -1,5 +1,7 @@
 # Reddit Top Comments
 
+This simple Chrome Extension shows the top comment for a Reddit post when you hover over the comments link.
+
 ## Preview
 ![Preview of Reddit Top Comments Extension](http://labs.hami.sh/reddit-top-comments/screenshot.png)
 

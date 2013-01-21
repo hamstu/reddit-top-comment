@@ -7,10 +7,10 @@
 
 Download a local copy of the project.
 
-  cd ~
-  mkdir chrome-ext
-  cd chrome-ext
-  git clone git@github.com:hamstu/reddit-top-comment.git
+    cd ~
+    mkdir chrome-ext
+    cd chrome-ext
+    git clone git@github.com:hamstu/reddit-top-comment.git
 
 Then in chrome browse to `chrome://extensions/` and be sure to check *Developer Mode* in the top right corner. Then click *Load unpacked extension...* button and choose the `~/chrome-ext/reddit-top-comment/ext` directory.
 
